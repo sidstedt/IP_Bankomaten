@@ -2,38 +2,87 @@
 {
     internal class Program
     {
-        static string[][] users;
-        static string[][] accounts;
+        public static long[][] users;
+        public static string[][] accounts;
         static void Main(string[] args)
         {
             InitializeUsersAndAccount();
+            bool run = true;
+            while (run)
+            {
+                Console.WriteLine("Välkommen till Daniels Bank AB");
+                Console.WriteLine("Ange personnr och din 5-siffriga pinkod!");
+                Console.Write("Personnr: ");
+                long userName = long.Parse(Console.ReadLine());
 
-            Console.WriteLine("Välkommen till Daniels Bank AB");
-            Console.WriteLine($"{users[0][0]}");
-            Console.WriteLine($"{accounts[0][1]}: {accounts[0][2]}");
-            Console.ReadKey();
+                int userIndex = SearchUser(userName);
+
+                if (userIndex != -1)
+                {
+                Console.Write("pinkod: ");
+                int pinCode = int.Parse(Console.ReadLine());
+                bool checkedPinCode = CheckPinCode(userIndex, pinCode);
+                    if (checkedPinCode)
+                    {
+                        Console.WriteLine("lyckad inloggning");
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Fel pinkod!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Användaren kunde inte hittas. Försök igen.");
+                }
+
+                Console.ReadKey();
+            }
         }
         public static void InitializeUsersAndAccount()
         {
             users = [
-        [ "910101-0101" , "12345"],
-                [ "920202-0202" , "12345"],
-                [ "930303-0303" , "12345"],
-                [ "940404-0404" , "12345"],
-                [ "950505-0505" , "12345"]
+                [ 9101010101 , 1234],
+                [ 9202020202 , 2345],
+                [ 9303030303 , 3456],
+                [ 9404040404 , 4567],
+                [ 9505050505 , 5678]
         ];
             accounts = [
-                [users[0][0], "Kortkonto" , "1000"],
-                [users[0][0], "Sparkonto" , "500"],
-                [users[1][0], "Kortkonto" , "2000"],
-                [users[1][0], "Sparkonto" , "1000"],
-                [users[2][0], "Kortkonto" , "3000"],
-                [users[2][0], "Sparkonto" , "1500"],
-                [users[3][0], "Kortkonto" , "4000"],
-                [users[3][0], "Sparkonto" , "2000"],
-                [users[4][0], "Kortkonto" , "5000"],
-                [users[4][0], "Sparkonto" , "2500"],
+                [users[0][0].ToString() , "Kortkonto" , "1000"],
+                [users[0][0].ToString() , "Sparkonto" , "500"],
+                [users[1][0].ToString() , "Kortkonto" , "2000"],
+                [users[1][0].ToString() , "Sparkonto" , "1000"],
+                [users[2][0].ToString() , "Kortkonto" , "3000"],
+                [users[2][0].ToString() , "Sparkonto" , "1500"],
+                [users[3][0].ToString() , "Kortkonto" , "4000"],
+                [users[3][0].ToString() , "Sparkonto" , "2000"],
+                [users[4][0].ToString() , "Kortkonto" , "5000"],
+                [users[4][0].ToString() , "Sparkonto" , "2500"],
                 ];
+        }
+        public static int SearchUser(long userName)
+        {
+            for (int i = 0; i < users.Length; i++)
+            {
+                if (users[i][0] == userName)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+        public static bool CheckPinCode(int userIndex, int pinCode)
+        {
+            for (int i = 0; i < users.Length; i++)
+            {
+                if (users[userIndex][1] == pinCode)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
