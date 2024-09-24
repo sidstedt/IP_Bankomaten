@@ -19,18 +19,24 @@
 
                 if (userIndex != -1)
                 {
-                Console.Write("pinkod: ");
-                int pinCode = int.Parse(Console.ReadLine());
-                bool checkedPinCode = CheckPinCode(userIndex, pinCode);
-                    if (checkedPinCode)
+                    int tries = 3;
+                    while (tries != 0)
                     {
-                        Console.WriteLine("lyckad inloggning");
+                        Console.Write("pinkod: ");
+                        int pinCode = int.Parse(Console.ReadLine());
+                        bool checkedPinCode = CheckPinCode(userIndex, pinCode);
+                        if (checkedPinCode)
+                        {
+                            Console.WriteLine("lyckad inloggning");
 
+                        }
+                        else
+                        {
+                            tries--;
+                            Console.WriteLine($"Fel pinkod! Du har {tries} försök kvar.");
+                        }
                     }
-                    else
-                    {
-                        Console.WriteLine("Fel pinkod!");
-                    }
+                    
                 }
                 else
                 {
@@ -38,6 +44,7 @@
                 }
 
                 Console.ReadKey();
+                Console.Clear();
             }
         }
         public static void InitializeUsersAndAccount()
