@@ -1,4 +1,6 @@
-﻿namespace IP_Bankomaten
+﻿using System.Net.Http.Headers;
+
+namespace IP_Bankomaten
 {
     internal class Program
     {
@@ -72,9 +74,50 @@
 
         public static void UserLoggedIn(int userIndex)
         {
-            Console.WriteLine($"Du är inloggad som {users[userIndex][0]}.");
-            Console.WriteLine("Du får nu fyra val att välja på!");
-            Console.ReadKey();
+            bool run = true;
+            while (run)
+            {
+                Console.WriteLine($"Du är inloggad som {users[userIndex][0]}.");
+                Console.WriteLine("Du får nu fyra val att välja på!" +
+                    "\n 1. Se dina konton och saldo" +
+                    "\n2. Överföring mellan konton" +
+                    "\n3. Ta ut pengar" +
+                    "\n4. Logga ut");
+                if (!int.TryParse(Console.ReadLine(), out int menuChoice))
+                {
+                    Console.WriteLine("Ogiltligt val!");
+                    continue;
+                }
+                switch (menuChoice)
+                {
+                    case 1:
+                        Accounts(userIndex);
+                        break;
+                    case 2:
+                        Transfer(userIndex);
+                        break;
+                    case 3:
+                        Withdrawal(userIndex);
+                        break;
+                    case 4:
+                        run = false;
+                        
+                        break;
+                }
+                Console.ReadKey();
+            }
+        }
+        public static void Accounts(int userIndex)
+        {
+            for (int i = 0;)
+        }
+        public static void Withdrawal(int userIndex)
+        {
+
+        }
+        public static void Transfer(int userIndex)
+        {
+
         }
         public static void InitializeUsersAndAccount()
         {
