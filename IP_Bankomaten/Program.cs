@@ -9,10 +9,18 @@ namespace IP_Bankomaten
         static void Main(string[] args)
         {
             InitializeUsersAndAccount();
-            int userIndex = UserLoggIn();
-            if (userIndex != -1)
+            bool run = true;
+            while (run)
             {
-                UserLoggedIn(userIndex);
+                int userIndex = UserLoggIn();
+                if (userIndex != -1)
+                {
+                    UserLoggedIn(userIndex);
+                }
+                else
+                {
+                    run = false;
+                }
             }
         }
 
@@ -49,17 +57,13 @@ namespace IP_Bankomaten
                             Console.WriteLine("lyckad inloggning");
                             return userIndex;
                         }
-                        else if (tries == 0)
-                        {
-                            return -1;
-                        }
                         else
                         {
                             tries--;
                             Console.WriteLine($"Fel pinkod! Du har {tries} försök kvar.");
                         }
                     }
-
+                    return -1;
                 }
                 else
                 {
@@ -77,15 +81,15 @@ namespace IP_Bankomaten
             bool run = true;
             while (run)
             {
-                Console.WriteLine($"Du är inloggad som {users[userIndex][0]}.");
                 Console.WriteLine("Du får nu fyra val att välja på!" +
-                    "\n 1. Se dina konton och saldo" +
+                    "\n1. Se dina konton och saldo" +
                     "\n2. Överföring mellan konton" +
                     "\n3. Ta ut pengar" +
                     "\n4. Logga ut");
                 if (!int.TryParse(Console.ReadLine(), out int menuChoice))
                 {
-                    Console.WriteLine("Ogiltligt val!");
+                    Console.Clear();
+                    Console.WriteLine("Ogiltligt val!\n");
                     continue;
                 }
                 switch (menuChoice)
@@ -101,7 +105,7 @@ namespace IP_Bankomaten
                         break;
                     case 4:
                         run = false;
-                        
+
                         break;
                 }
                 Console.ReadKey();
@@ -109,13 +113,31 @@ namespace IP_Bankomaten
         }
         public static void Accounts(int userIndex)
         {
-            for (int i = 0;)
-        }
-        public static void Withdrawal(int userIndex)
-        {
-
+            foreach (var account in accounts)
+            {
+                if (account[0] == users[userIndex][0].ToString())
+                {
+                    Console.WriteLine($"{account[1]}: {account[2]}");
+                }
+            }
+            Console.WriteLine("Tryck på enter för att återgå");
+            while (Console.ReadKey().Key != ConsoleKey.Enter)
+            {
+            }
+            Console.Clear();
         }
         public static void Transfer(int userIndex)
+        {
+            Console.WriteLine("Överföring. Välj konto.");
+            foreach (var account in accounts)
+            {
+                if (account[0] == users[userIndex].ToString())
+                {
+
+                }
+            }
+        }
+        public static void Withdrawal(int userIndex)
         {
 
         }
