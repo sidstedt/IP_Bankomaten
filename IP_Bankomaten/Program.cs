@@ -34,11 +34,11 @@ namespace IP_Bankomaten
             // initialize accounts
             accounts = new string[][][]
             {
-                new string[][] { new string[] { "Kortkonto", "1000" }, new string[] { "Sparkonto", "500" } },
-                new string[][] { new string[] { "Kortkonto", "2000" }, new string[] { "Sparkonto", "1000" } },
-                new string[][] { new string[] { "Kortkonto", "3000" }, new string[] { "Sparkonto", "1500" } },
-                new string[][] { new string[] { "Kortkonto", "4000" }, new string[] { "Sparkonto", "2000" } },
-                new string[][] { new string[] { "Kortkonto", "5000" }, new string[] { "Sparkonto", "2500" } }
+                new string[][] { new string[] { "Kortkonto", "1000.50" }, new string[] { "Sparkonto", "500.66" } },
+                new string[][] { new string[] { "Kortkonto", "2000.34" }, new string[] { "Sparkonto", "1000.56" } },
+                new string[][] { new string[] { "Kortkonto", "3000.23" }, new string[] { "Sparkonto", "1500.56" } },
+                new string[][] { new string[] { "Kortkonto", "4000.77" }, new string[] { "Sparkonto", "2000.32" } },
+                new string[][] { new string[] { "Kortkonto", "5000.53" }, new string[] { "Sparkonto", "2500.12" } }
             };
         }
 
@@ -160,7 +160,7 @@ namespace IP_Bankomaten
             // Loop through and write out all associated accounts from user
             for (int i = 0; i < accounts[userIndex].Length; i++)
             {
-                Console.WriteLine($"Konto: {accounts[userIndex][i][0]}, Saldo: {accounts[userIndex][i][1]}");
+                Console.WriteLine($"Konto: {accounts[userIndex][i][0]}, Saldo: {double.Parse(accounts[userIndex][i][1]).ToString("F2")}");
             }
             Console.WriteLine("\nTryck på enter för att återgå till menyn!");
             while (Console.ReadKey(true).Key != ConsoleKey.Enter) { }
@@ -188,7 +188,7 @@ namespace IP_Bankomaten
                     {
                         Console.ResetColor();
                     }
-                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {accounts[userIndex][i][1]}");
+                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {double.Parse(accounts[userIndex][i][1]).ToString("F2")}");
                 }
                 Console.ResetColor();
                 // store inputkey from user
@@ -208,46 +208,54 @@ namespace IP_Bankomaten
                     // if user press enter exit loop
                     case ConsoleKey.Enter:
                         select = false;
-                        Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} med saldot: {accounts[userIndex][selectedAccount][1]}");
                         break;
                 }
             }
             if (selectedAccount != -1)
             {
-                Console.Write("Ange belopp att ta ut: ");
-                // if user input is correct
-                if (int.TryParse(Console.ReadLine(), out int amountToWithdraw))
+                bool run = true;
+                while (run)
                 {
-                    // parse the value from account to int and store to variable
-                    int currentBalance = int.Parse(accounts[userIndex][selectedAccount][1]);
-                    // if the amount to withdraw is less or equal to balance
-                    if (amountToWithdraw <= currentBalance)
+                    Console.Clear();
+                    Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} " +
+                        $"med saldot: {double.Parse(accounts[userIndex][selectedAccount][1]).ToString("F2")}");
+                    Console.Write("Ange belopp att ta ut: ");
+                    // if user input is correct
+                    if (double.TryParse(Console.ReadLine(), out double amountToWithdraw))
                     {
-                        // negate the current balance with the amount to withdraw
-                        currentBalance -= amountToWithdraw;
-                        // convert to string and save amount left to account
-                        accounts[userIndex][selectedAccount][1] = currentBalance.ToString();
-                        Console.WriteLine($"Uttag lyckades! " +
-                            $"\nUttaget belopp: {amountToWithdraw}." +
-                            $"\nBefintligt saldo: {accounts[userIndex][selectedAccount][1]}.");
-                        Console.WriteLine("Ha en bra dag!" +
-                            "\nTryck på valfri tangent för att stänga ner");
-                        Console.ReadKey();
-                        Environment.Exit(0);
+                        // parse the value from account to int and store to variable
+                        double currentBalance = double.Parse(accounts[userIndex][selectedAccount][1]);
+                        // if the amount to withdraw is less or equal to balance
+                        if (amountToWithdraw <= currentBalance)
+                        {
+                            // negate the current balance with the amount to withdraw
+                            currentBalance -= amountToWithdraw;
+                            // convert to string and save amount left to account
+                            accounts[userIndex][selectedAccount][1] = currentBalance.ToString();
+                            Console.WriteLine($"Uttag lyckades! " +
+                                $"\nUttaget belopp: {amountToWithdraw}." +
+                                $"\nBefintligt saldo: {double.Parse(accounts[userIndex][selectedAccount][1]).ToString("F2")}.");
+                            Console.WriteLine("\nTryck på enter för att återgå till menyn.");
+                            while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                            { }
+                            run = false;
+                        }
+                        // if the amount is bigger than the balance shut down
+                        else
+                        {
+                            Console.WriteLine("\nOtillräckligt saldo! Tryck på enter för att försöka igen.");
+                            while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                            { }
+                        }
                     }
-                    // if the amount is bigger than the balance shut down
+                    // if user inputed incorrect value
                     else
                     {
-                        Console.WriteLine("Otillräckligt saldo! Uttag misslyckades" +
-                            "\nBankomaten stängs ner. Tryck på valfri tangent!");
-                        Console.ReadKey();
-                        Environment.Exit(0);
+                        Console.WriteLine("Ogiltligt belopp.");
+                        Console.WriteLine("Tryck på enter för att försöka igen.");
+                        while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                        { }
                     }
-                }
-                // if user inputed incorrect value
-                else
-                {
-                    Console.WriteLine("Ogiltligt belopp.");
                 }
             }
             // if no account was selected
@@ -264,6 +272,7 @@ namespace IP_Bankomaten
             bool select = true;
             // give first "index value" to selectedAccount
             int selectedAccount = 0;
+            // set variable of account index to negative value
             int choice1 = -1;
             int choice2 = -1;
             while (select)
@@ -284,7 +293,7 @@ namespace IP_Bankomaten
                     {
                         Console.ResetColor();
                     }
-                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {accounts[userIndex][i][1]}");
+                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {double.Parse(accounts[userIndex][i][1]).ToString("F2")}");
                 }
                 Console.ResetColor();
                 // store inputkey from user
@@ -315,7 +324,7 @@ namespace IP_Bankomaten
                             // set choice2 to selected account index value
                             choice2 = selectedAccount;
                         }
-                        Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} med saldot: {accounts[userIndex][selectedAccount][1]}");
+                        Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} med saldot: {double.Parse(accounts[userIndex][selectedAccount][1]).ToString("F2")}");
                         Console.WriteLine("Tryck på Enter för att fortsätta.");
                         while (Console.ReadKey(true).Key != ConsoleKey.Enter)
                         {
@@ -337,16 +346,16 @@ namespace IP_Bankomaten
             while (run)
             {
                 // Save current balance to int variable
-                int BalanceOne = int.Parse(accounts[index][one][1]);
-                int BalanceTwo = int.Parse(accounts[index][two][1]);
-                Console.Write($"Hur mycket vill du föra över från {accounts[index][one][0]} med saldot: {accounts[index][one][1]} till " +
-                    $"{accounts[index][two][0]} med saldot: {accounts[index][two][1]}?" +
+                double BalanceOne = double.Parse(accounts[index][one][1]);
+                double BalanceTwo = double.Parse(accounts[index][two][1]);
+                Console.Write($"Hur mycket vill du föra över från {accounts[index][one][0]} med saldot: {double.Parse(accounts[index][one][1]).ToString("F2")} till " +
+                    $"{accounts[index][two][0]} med saldot: {double.Parse(accounts[index][two][1]).ToString("F2")}?" +
                     $"\nAnge belopp: ");
                 // check user input
-                if (int.TryParse(Console.ReadLine(), out int amount))
+                if (double.TryParse(Console.ReadLine(), out double amount))
                 {
                     // If amount is no more than current value
-                    if (amount <= int.Parse(accounts[index][one][1]))
+                    if (amount <= double.Parse(accounts[index][one][1]))
                     {
                         // subtract and add new value
                         BalanceOne -= amount;
@@ -355,12 +364,11 @@ namespace IP_Bankomaten
                         accounts[index][one][1] = BalanceOne.ToString();
                         accounts[index][two][1] = BalanceTwo.ToString();
                         Console.WriteLine($"Överföring gjord. Nuvarande saldo" +
-                            $"\n{accounts[index][one][0]} med saldot: {accounts[index][one][1]}" +
-                            $"\n{accounts[index][two][0]} med saldot: {accounts[index][two][1]}");
+                            $"\n{accounts[index][one][0]} med saldot: {double.Parse(accounts[index][one][1]).ToString("F2")}" +
+                            $"\n{accounts[index][two][0]} med saldot: {double.Parse(accounts[index][two][1]).ToString("F2")}");
                         Console.WriteLine("\nTryck på enter för att återgå till menyn");
                         while (Console.ReadKey(true).Key != ConsoleKey.Enter)
                         {
-
                         }
                         run = false;
                     }
