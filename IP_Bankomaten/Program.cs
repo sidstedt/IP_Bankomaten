@@ -92,16 +92,21 @@ namespace IP_Bankomaten
                         {
                             Console.Clear();
                             tries--;
-                            Console.WriteLine($"Fel pinkod! Du har {tries} försök kvar.");
+                            // write out as long as the user have tries left
+                            if (tries > 0)
+                                Console.WriteLine($"Fel pinkod! Du har {tries} försök kvar.");
                         }
-                        // if no tries are left return -1
+                        // if no tries are left close down
                         if (tries == 0)
                         {
-                            return -1;
+                            Console.WriteLine("Du har angett fel pinkod för många gånger!" +
+                                "\nTryck på valfri tanget för att stänga av.");
+                            Console.ReadKey();
+                            Environment.Exit(0);
                         }
                     }
-                    return -1;
                 }
+                // if user could not be found
                 else
                 {
                     Console.WriteLine("Användaren kunde inte hittas. Försök igen.");
@@ -152,6 +157,7 @@ namespace IP_Bankomaten
         public static void Accounts(int userIndex)
         {
             Console.WriteLine($"Konton för användare {users[userIndex][0]}:");
+            // Loop through and write out all associated accounts from user
             for (int i = 0; i < accounts[userIndex].Length; i++)
             {
                 Console.WriteLine($"Konto: {accounts[userIndex][i][0]}, Saldo: {accounts[userIndex][i][1]}");
@@ -159,7 +165,97 @@ namespace IP_Bankomaten
         }
         public static void Withdrawal(int userIndex)
         {
-
+            bool select = true;
+            // give first "index value" to selectedAccount
+            int selectedAccount = 0;
+            while (select)
+            {
+                Console.Clear();
+                Console.WriteLine($"Välj konto för uttag");
+                // loop and write out the accounts
+                for (int i = 0; i < accounts[userIndex].Length; i++)
+                {
+                    // write out the selected account marked with color
+                    if (i == selectedAccount)
+                    {
+                        Console.BackgroundColor = ConsoleColor.Green;
+                        Console.ForegroundColor = ConsoleColor.Black;
+                    }
+                    // and reset the color for the accounts not selected
+                    else
+                    {
+                        Console.ResetColor();
+                    }
+                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {accounts[userIndex][i][1]}");
+                }
+                Console.ResetColor();
+                // store inputkey from user
+                var key = Console.ReadKey(true).Key;
+                switch (key)
+                {
+                    case ConsoleKey.UpArrow:
+                        // as long as the value is bigger than 0, decrease
+                        if (selectedAccount > 0)
+                            selectedAccount--;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        // as long as the value is less than total value - 1, increase
+                        if (selectedAccount < accounts[userIndex].Length - 1)
+                            selectedAccount++;
+                        break;
+                    // if user press enter exit loop
+                    case ConsoleKey.Enter:
+                        select = false;
+                        Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} med saldot: {accounts[userIndex][selectedAccount][1]}");
+                        break;
+                }
+            }
+            if (selectedAccount != -1)
+            {
+                    Console.Write("Ange belopp att ta ut: ");
+                // if user input is correct
+                if (int.TryParse(Console.ReadLine(), out int amountToWithdraw))
+                {
+                    // parse the value from account to int and store to variable
+                    int currentBalance = int.Parse(accounts[userIndex][selectedAccount][1]);
+                    // if the amount to withdraw is less or equal to balance
+                    if (amountToWithdraw <= currentBalance)
+                    {
+                        // negate the current balance with the amount to withdraw
+                        currentBalance -= amountToWithdraw;
+                        // convert to string and save amount left to account
+                        accounts[userIndex][selectedAccount][1] = currentBalance.ToString();
+                        Console.WriteLine($"Uttag lyckades! " +
+                            $"\nUttaget belopp: {amountToWithdraw}." +
+                            $"\nBefintligt saldo: {accounts[userIndex][selectedAccount][1]}.");
+                        Console.WriteLine("Ha en bra dag!" +
+                            "\nTryck på valfri tangent för att stänga ner");
+                        Console.ReadKey();
+                        Environment.Exit(0);
+                    }
+                    // if the amount is bigger than the balance shut down
+                    else
+                    {
+                        Console.WriteLine("Otillräckligt saldo! Uttag misslyckades" +
+                            "\nBankomaten stängs ner. Tryck på valfri tangent!");
+                        Console.ReadKey();
+                        Environment.Exit(0);
+                    }
+                }
+                // if user inputed incorrect value
+                else
+                {
+                    Console.WriteLine("Ogiltligt belopp.");
+                }
+            }
+            // if no account was selected
+            else
+            {
+                Console.WriteLine("inget konto valt. Tryck på enter för att återgå till menyn");
+                while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                {
+                }
+            }
         }
         public static void Transfer(int userIndex)
         {
@@ -167,8 +263,10 @@ namespace IP_Bankomaten
         }
         public static int SearchUser(long userName)
         {
+            // iteriate through all users
             for (int i = 0; i < users.Length; i++)
             {
+                // if user in the array is equal to input return index value
                 if (users[i][0] == userName)
                 {
                     return i;
@@ -178,8 +276,11 @@ namespace IP_Bankomaten
         }
         public static bool CheckPinCode(int userIndex, int pinCode)
         {
+            // iteriate through the amount of total index length
             for (int i = 0; i < users.Length; i++)
             {
+                // if user index with associated pin code is same as input
+                // return bool = true
                 if (users[userIndex][1] == pinCode)
                 {
                     return true;
