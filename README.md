@@ -39,7 +39,7 @@ Denna sektion är till för att hålla koll på vad som ska göras och vad som �
 
 - [x]  Denna funktion ska köras när användaren navigerat in till alternativet "Se dina konton och saldo".
 - [x]  Användaren ska få en utskrift av de olika konton som användaren har och hur mycket pengar det finns på dessa.
-- [ ]  Konton ska kunna ha både kronor och ören.
+- [x]  Konton ska kunna ha både kronor och ören.
 - [x]  Alla användare ska ha olika antal konton och alla ska ha minst ett konto.
 - [x]  Varje konto ska ha ett namn, ex. "lönekonto" eller "sparkonto".
 - [x]  Saldon för alla konton sätts vid starten av programmet (du ställer in en en summa som finns på varje konto i koden) så om programmet startas om återställs alla saldon.
@@ -58,10 +58,10 @@ Denna sektion är till för att hålla koll på vad som ska göras och vad som �
 
 - [x]  Denna funktion ska köras när användaren navigerat in till alternativet "Ta ut pengar".
 - [x]  Användaren ska kunna välja ett av sina konton samt en summa att ta ut.
-- [ ]  Efter detta måste användaren skriva in sin pinkod för att bekräfta att de vill ta ut pengar.
+- [x]  Efter detta måste användaren skriva in sin pinkod för att bekräfta att de vill ta ut pengar.
 - [x]  Lägg till ett felmeddelande om användaren försöker ta ut mer pengar än vad som finns på kontot.
 - [x]  Pengarna ska sedan tas bort från det konto som valdes.
-- [ ]  Sist av allt ska systemet skriva ut det nya saldot på det kontot.
+- [x]  Sist av allt ska systemet skriva ut det nya saldot på det kontot.
 </aside>
 
 <aside>
