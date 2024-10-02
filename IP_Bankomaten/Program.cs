@@ -1,4 +1,6 @@
-﻿namespace IP_Bankomaten
+﻿using System.Net.Http.Headers;
+
+namespace IP_Bankomaten
 {
     internal class Program
     {
@@ -7,14 +9,27 @@
         static void Main(string[] args)
         {
             InitializeUsersAndAccount();
+            int userIndex = UserLoggIn();
+            if (userIndex != -1)
+            {
+                UserLoggedIn(userIndex);
+            }
+        }
+
+        public static int UserLoggIn()
+        {
             bool run = true;
             while (run)
             {
                 Console.WriteLine("Välkommen till Daniels Bank AB");
                 Console.WriteLine("Ange personnr och din 5-siffriga pinkod!");
                 Console.Write("Personnr: ");
-                long userName = long.Parse(Console.ReadLine());
 
+                if (!long.TryParse(Console.ReadLine(), out long userName))
+                {
+                    Console.WriteLine("Ogiltligt personnummer, försök igen.");
+                    continue;
+                }
                 int userIndex = SearchUser(userName);
 
                 if (userIndex != -1)
@@ -23,12 +38,20 @@
                     while (tries != 0)
                     {
                         Console.Write("pinkod: ");
-                        int pinCode = int.Parse(Console.ReadLine());
+                        if (!int.TryParse(Console.ReadLine(), out int pinCode))
+                        {
+                            Console.WriteLine("ogiltligt värde, försök igen");
+                            continue;
+                        }
                         bool checkedPinCode = CheckPinCode(userIndex, pinCode);
                         if (checkedPinCode)
                         {
                             Console.WriteLine("lyckad inloggning");
-
+                            return userIndex;
+                        }
+                        else if (tries == 0)
+                        {
+                            return -1;
                         }
                         else
                         {
@@ -36,7 +59,7 @@
                             Console.WriteLine($"Fel pinkod! Du har {tries} försök kvar.");
                         }
                     }
-                    
+
                 }
                 else
                 {
@@ -46,6 +69,55 @@
                 Console.ReadKey();
                 Console.Clear();
             }
+            return -1;
+        }
+
+        public static void UserLoggedIn(int userIndex)
+        {
+            bool run = true;
+            while (run)
+            {
+                Console.WriteLine($"Du är inloggad som {users[userIndex][0]}.");
+                Console.WriteLine("Du får nu fyra val att välja på!" +
+                    "\n 1. Se dina konton och saldo" +
+                    "\n2. Överföring mellan konton" +
+                    "\n3. Ta ut pengar" +
+                    "\n4. Logga ut");
+                if (!int.TryParse(Console.ReadLine(), out int menuChoice))
+                {
+                    Console.WriteLine("Ogiltligt val!");
+                    continue;
+                }
+                switch (menuChoice)
+                {
+                    case 1:
+                        Accounts(userIndex);
+                        break;
+                    case 2:
+                        Transfer(userIndex);
+                        break;
+                    case 3:
+                        Withdrawal(userIndex);
+                        break;
+                    case 4:
+                        run = false;
+                        
+                        break;
+                }
+                Console.ReadKey();
+            }
+        }
+        public static void Accounts(int userIndex)
+        {
+            for (int i = 0;)
+        }
+        public static void Withdrawal(int userIndex)
+        {
+
+        }
+        public static void Transfer(int userIndex)
+        {
+
         }
         public static void InitializeUsersAndAccount()
         {
