@@ -16,6 +16,7 @@ namespace IP_Bankomaten
             // if return value is not negative
             if (userIndex != -1)
             {
+                Console.Clear();
                 // call method and pass index value
                 UserLoggedIn(userIndex);
             }
@@ -54,7 +55,9 @@ namespace IP_Bankomaten
                 // declare and try the user input else write out to try again
                 if (!long.TryParse(Console.ReadLine(), out long userName))
                 {
-                    Console.WriteLine("Ogiltligt personnummer, försök igen.");
+                    Console.WriteLine("Ogiltligt personnummer, tryck enter för att försöka igen.");
+                    while (Console.ReadKey(true).Key != ConsoleKey.Enter) { }
+                    Console.Clear();
                     continue;
                 }
                 // call method with user input and save return value
@@ -73,7 +76,6 @@ namespace IP_Bankomaten
                 {
                     Console.WriteLine("Användaren kunde inte hittas. Försök igen.");
                 }
-
                 Console.ReadKey();
                 Console.Clear();
             }
@@ -109,7 +111,6 @@ namespace IP_Bankomaten
                         break;
                     case 4:
                         run = false;
-
                         break;
                 }
                 Console.Clear();
@@ -122,7 +123,7 @@ namespace IP_Bankomaten
             // Loop through and write out all associated accounts from user
             for (int i = 0; i < accounts[userIndex].Length; i++)
             {
-                Console.WriteLine($"Konto: {accounts[userIndex][i][0]}, Saldo: {double.Parse(accounts[userIndex][i][1]).ToString("F2")}");
+                Console.WriteLine($"Konto: {accounts[userIndex][i][0]}, Saldo: {double.Parse(accounts[userIndex][i][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}");
             }
             Console.WriteLine("\nTryck på enter för att återgå till menyn!");
             while (Console.ReadKey(true).Key != ConsoleKey.Enter) { }
@@ -150,7 +151,7 @@ namespace IP_Bankomaten
                     {
                         Console.ResetColor();
                     }
-                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {double.Parse(accounts[userIndex][i][1]).ToString("F2")}");
+                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {double.Parse(accounts[userIndex][i][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}");
                 }
                 Console.ResetColor();
                 // store inputkey from user
@@ -180,7 +181,7 @@ namespace IP_Bankomaten
                 {
                     Console.Clear();
                     Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} " +
-                        $"med saldot: {double.Parse(accounts[userIndex][selectedAccount][1]).ToString("F2")}");
+                        $"med saldot: {double.Parse(accounts[userIndex][selectedAccount][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}");
                     Console.Write("Ange belopp att ta ut: ");
                     // if user input is correct
                     if (double.TryParse(Console.ReadLine(), out double amountToWithdraw))
@@ -202,9 +203,8 @@ namespace IP_Bankomaten
                             currentBalance -= amountToWithdraw;
                             // convert to string and save amount left to account
                             accounts[userIndex][selectedAccount][1] = currentBalance.ToString();
-                            Console.WriteLine($"Uttag lyckades! " +
-                                $"\nUttaget belopp: {amountToWithdraw}." +
-                                $"\nBefintligt saldo: {double.Parse(accounts[userIndex][selectedAccount][1]).ToString("F2")}.");
+                            Console.WriteLine($"Uttaget belopp: {amountToWithdraw}." +
+                                $"\nNuvarande saldo: {double.Parse(accounts[userIndex][selectedAccount][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}.");
                             Console.WriteLine("\nTryck på enter för att återgå till menyn.");
                             while (Console.ReadKey(true).Key != ConsoleKey.Enter)
                             { }
@@ -263,7 +263,7 @@ namespace IP_Bankomaten
                     {
                         Console.ResetColor();
                     }
-                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {double.Parse(accounts[userIndex][i][1]).ToString("F2")}");
+                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {double.Parse(accounts[userIndex][i][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}");
                 }
                 Console.ResetColor();
                 // store inputkey from user
@@ -294,7 +294,7 @@ namespace IP_Bankomaten
                             // set choice2 to selected account index value
                             choice2 = selectedAccount;
                         }
-                        Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} med saldot: {double.Parse(accounts[userIndex][selectedAccount][1]).ToString("F2")}");
+                        Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} med saldot: {double.Parse(accounts[userIndex][selectedAccount][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}");
                         Console.WriteLine("Tryck på Enter för att fortsätta.");
                         while (Console.ReadKey(true).Key != ConsoleKey.Enter)
                         {
@@ -318,8 +318,8 @@ namespace IP_Bankomaten
                 // Save current balance to int variable
                 double BalanceOne = double.Parse(accounts[index][one][1]);
                 double BalanceTwo = double.Parse(accounts[index][two][1]);
-                Console.Write($"Hur mycket vill du föra över från {accounts[index][one][0]} med saldot: {double.Parse(accounts[index][one][1]).ToString("F2")} till " +
-                    $"{accounts[index][two][0]} med saldot: {double.Parse(accounts[index][two][1]).ToString("F2")}?" +
+                Console.Write($"Hur mycket vill du föra över från {accounts[index][one][0]} med saldot: {double.Parse(accounts[index][one][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))} till " +
+                    $"{accounts[index][two][0]} med saldot: {double.Parse(accounts[index][two][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}?" +
                     $"\nAnge belopp: ");
                 // check user input
                 if (double.TryParse(Console.ReadLine(), out double amount))
@@ -327,6 +327,7 @@ namespace IP_Bankomaten
                     // If amount is no more than current value
                     if (amount <= double.Parse(accounts[index][one][1]))
                     {
+                        Console.Clear();
                         // subtract and add new value
                         BalanceOne -= amount;
                         BalanceTwo += amount;
@@ -334,8 +335,8 @@ namespace IP_Bankomaten
                         accounts[index][one][1] = BalanceOne.ToString();
                         accounts[index][two][1] = BalanceTwo.ToString();
                         Console.WriteLine($"Överföring gjord. Nuvarande saldo" +
-                            $"\n{accounts[index][one][0]} med saldot: {double.Parse(accounts[index][one][1]).ToString("F2")}" +
-                            $"\n{accounts[index][two][0]} med saldot: {double.Parse(accounts[index][two][1]).ToString("F2")}");
+                            $"\n{accounts[index][one][0]} med saldot: {double.Parse(accounts[index][one][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}" +
+                            $"\n{accounts[index][two][0]} med saldot: {double.Parse(accounts[index][two][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}");
                         Console.WriteLine("\nTryck på enter för att återgå till menyn");
                         while (Console.ReadKey(true).Key != ConsoleKey.Enter)
                         {
@@ -400,7 +401,6 @@ namespace IP_Bankomaten
                 // if personal number & pin code match return index value
                 if (checkedPinCode)
                 {
-                    Console.WriteLine("lyckad inloggning");
                     return true;
                 }
                 // if user input correct pin code negate tries with 1
