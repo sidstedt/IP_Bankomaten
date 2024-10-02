@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 
 namespace IP_Bankomaten
 {
@@ -150,7 +151,8 @@ namespace IP_Bankomaten
                     "\n1. Se dina konton och saldo" +
                     "\n2. Överföring mellan konton" +
                     "\n3. Ta ut pengar" +
-                    "\n4. Logga ut");
+                    "\n4. Skapa nytt konto" +
+                    "\n5. Logga ut");
                 if (!int.TryParse(Console.ReadLine(), out int menuChoice))
                 {
                     Console.Clear();
@@ -169,6 +171,9 @@ namespace IP_Bankomaten
                         Withdrawal(userIndex);
                         break;
                     case 4:
+                        CreateNewAccount(userIndex);
+                        break;
+                    case 5:
                         run = false;
                         break;
                 }
@@ -482,6 +487,86 @@ namespace IP_Bankomaten
                 }
             }
             return false;
+        }
+        public static void CreateNewAccount(int userIndex)
+        {
+            Console.Clear();
+            string accountType;
+            while (true)
+            {
+                Console.WriteLine("Skapa ett nytt konto för användaren." +
+                    "\n Ange kontotyp (ex. Kortkonto, Sparkonto): ");
+                accountType = Console.ReadLine();
+                // if string is not null or empty and only contains alfabetic letters from A to Ö
+                if (!string.IsNullOrEmpty(accountType) && Regex.IsMatch(accountType, @"^[a-öA-Ö]+$"))
+                {
+                    // breaks the loop
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Kontonamn kan endast innehålla bokstäverna A-Ö" +
+                        "\nTryck enter för att försöka igen");
+                    while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                    { }
+                }
+            }
+            Console.WriteLine("Ange belopp på insättning: ");
+            if (!double.TryParse(Console.ReadLine(), out double amount))
+            {
+                Console.WriteLine("Ogiltligt belopp, försök igen!");
+                return;
+            }
+            // Store existing account length from user
+            int existingAccounts = accounts[userIndex].Length;
+            // Create new jagged array with index range from existing + 1
+            string[][] newAccounts = new string[existingAccounts + 1][];
+            // iteriate through existing accounts
+            for (int i = 0; i < existingAccounts; i++)
+            {
+                // pass accountname and balance to newAccounts array
+                newAccounts[i] = accounts[userIndex][i];
+            }
+            // save the new account and balance to the last index of newAccounts
+            newAccounts[existingAccounts] = new string[] {accountType, amount.ToString()};
+            // Update the accounts with new values
+            accounts[userIndex] = newAccounts;
+
+            // call method to save to file
+            SaveAccountsToFile("..\\..\\..\\accounts.txt");
+
+            Console.WriteLine($"Nytt konto {accountType} med startbelopp {amount.ToString("C2", new System.Globalization.CultureInfo("sv-SE"))} har skapats.");
+            Console.WriteLine("Tryck på enter för att återgå till menyn.");
+            while (Console.ReadKey(true).Key != ConsoleKey.Enter) { }
+        }
+        public static void SaveAccountsToFile(string filePath)
+        {
+            try
+            {
+                // Create an array to hold the formatted account data
+                string[] lines = new string[accounts.Length];
+                // Loop through each user and their accounts
+                for (int i = 0; i < accounts.Length; i++)
+                {
+                    string[] userAccounts = new string[accounts[i].Length];
+                    // Loop through each account for the current user
+                    for (int j = 0; j < accounts[i].Length; j++)
+                    {
+                        // combine accountname and balance with comma between them
+                        userAccounts[j] = $"{accounts[i][j][0]},{accounts[i][j][1]}";
+                    }
+                    // use join to combine user accounts in one line with whitespace between them 
+                    lines[i] = string.Join(" ", userAccounts);
+                }
+
+                // write lines back to file
+                File.WriteAllLines(filePath, lines);
+                Console.WriteLine("Kontouppdateringar sparades till filen.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Ett fel uppstod när kontona skulle sparas: {e.Message}");
+            }
         }
     }
 }
