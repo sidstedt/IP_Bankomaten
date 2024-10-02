@@ -150,18 +150,20 @@ namespace IP_Bankomaten
 
                         break;
                 }
-                Console.ReadKey();
                 Console.Clear();
             }
         }
         public static void Accounts(int userIndex)
         {
+            Console.Clear();
             Console.WriteLine($"Konton för användare {users[userIndex][0]}:");
             // Loop through and write out all associated accounts from user
             for (int i = 0; i < accounts[userIndex].Length; i++)
             {
                 Console.WriteLine($"Konto: {accounts[userIndex][i][0]}, Saldo: {accounts[userIndex][i][1]}");
             }
+            Console.WriteLine("\nTryck på enter för att återgå till menyn!");
+            while (Console.ReadKey(true).Key != ConsoleKey.Enter) { }
         }
         public static void Withdrawal(int userIndex)
         {
@@ -212,7 +214,7 @@ namespace IP_Bankomaten
             }
             if (selectedAccount != -1)
             {
-                    Console.Write("Ange belopp att ta ut: ");
+                Console.Write("Ange belopp att ta ut: ");
                 // if user input is correct
                 if (int.TryParse(Console.ReadLine(), out int amountToWithdraw))
                 {
@@ -259,7 +261,120 @@ namespace IP_Bankomaten
         }
         public static void Transfer(int userIndex)
         {
+            bool select = true;
+            // give first "index value" to selectedAccount
+            int selectedAccount = 0;
+            int choice1 = -1;
+            int choice2 = -1;
+            while (select)
+            {
+                Console.Clear();
+                Console.WriteLine($"Välj konto för uttag");
+                // loop and write out the accounts
+                for (int i = 0; i < accounts[userIndex].Length; i++)
+                {
+                    // write out the selected account marked with color
+                    if (i == selectedAccount)
+                    {
+                        Console.BackgroundColor = ConsoleColor.Green;
+                        Console.ForegroundColor = ConsoleColor.Black;
+                    }
+                    // and reset the color for the accounts not selected
+                    else
+                    {
+                        Console.ResetColor();
+                    }
+                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {accounts[userIndex][i][1]}");
+                }
+                Console.ResetColor();
+                // store inputkey from user
+                var key = Console.ReadKey(true).Key;
+                switch (key)
+                {
+                    case ConsoleKey.UpArrow:
+                        // as long as the value is bigger than 0, decrease
+                        if (selectedAccount > 0)
+                            selectedAccount--;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        // as long as the value is less than total value - 1, increase
+                        if (selectedAccount < accounts[userIndex].Length - 1)
+                            selectedAccount++;
+                        break;
+                    // if user press enter
+                    case ConsoleKey.Enter:
+                        // if the first has no index value
+                        if (choice1 == -1)
+                        {
+                            // set choice1 to selected account index value
+                            choice1 = selectedAccount;
+                        }
+                        // if the second has no index value
+                        else if (choice2 == -1)
+                        {
+                            // set choice2 to selected account index value
+                            choice2 = selectedAccount;
+                        }
+                        Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} med saldot: {accounts[userIndex][selectedAccount][1]}");
+                        Console.WriteLine("Tryck på Enter för att fortsätta.");
+                        while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                        {
+                        }
+                        // if both have given a value
+                        if (choice1 != -1 && choice2 != -1)
+                        {
+                            select = false;
+                            TransferMoney(userIndex, choice1, choice2);
+                        }
+                        break;
+                }
+            }
+        }
+        public static void TransferMoney(int index, int one, int two)
+        {
+            Console.Clear();
+            bool run = true;
+            while (run)
+            {
+                // Save current balance to int variable
+                int BalanceOne = int.Parse(accounts[index][one][1]);
+                int BalanceTwo = int.Parse(accounts[index][two][1]);
+                Console.Write($"Hur mycket vill du föra över från {accounts[index][one][0]} med saldot: {accounts[index][one][1]} till " +
+                    $"{accounts[index][two][0]} med saldot: {accounts[index][two][1]}?" +
+                    $"\nAnge belopp: ");
+                // check user input
+                if (int.TryParse(Console.ReadLine(), out int amount))
+                {
+                    // If amount is no more than current value
+                    if (amount <= int.Parse(accounts[index][one][1]))
+                    {
+                        // subtract and add new value
+                        BalanceOne -= amount;
+                        BalanceTwo += amount;
+                        // overwrite to new value
+                        accounts[index][one][1] = BalanceOne.ToString();
+                        accounts[index][two][1] = BalanceTwo.ToString();
+                        Console.WriteLine($"Överföring gjord. Nuvarande saldo" +
+                            $"\n{accounts[index][one][0]} med saldot: {accounts[index][one][1]}" +
+                            $"\n{accounts[index][two][0]} med saldot: {accounts[index][two][1]}");
+                        Console.WriteLine("\nTryck på enter för att återgå till menyn");
+                        while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                        {
 
+                        }
+                        run = false;
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Angivet belopp är mer än vad som är tillgängligt. Försök igen!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Ogiltligt val! Försök igen");
+                }
+            }
         }
         public static int SearchUser(long userName)
         {
