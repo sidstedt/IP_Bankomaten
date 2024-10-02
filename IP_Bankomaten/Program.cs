@@ -23,24 +23,83 @@ namespace IP_Bankomaten
         }
         public static void InitializeUsersAndAccount()
         {
+            // store filepath to variable
+            string usersFilePath = "..\\..\\..\\users.txt";
+            // try this code else catch exception
+            try
+            {
+                // read all lines to an array
+                string[] lines = File.ReadAllLines(usersFilePath);
+                // Creates new jagged with size of index based on length
+                users = new long[lines.Length][];
+                // do for every line
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    // split between personal number and pin code
+                    string[] split = lines[i].Split(' ');
+                    // parse and store personal number and pin code to array
+                    users[i] = new long[] { long.Parse(split[0]), long.Parse(split[1]) };
+                }
+            }
+            // catch if no file found
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Users-filen hittades inte");
+            }
+            // other exception found in file
+            catch (Exception e)
+            {
+                Console.WriteLine($"Fel i users.txt {e.Message}");
+            }
+            string accountFilePath = "..\\..\\..\\accounts.txt";
+            try
+            {
+                string[] lines = File.ReadAllLines(accountFilePath);
+                accounts = new string[lines.Length][][];
+
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    // split account entries separated by whitespace
+                    string[] splitEntry = lines[i].Split(' ');
+                    accounts[i] = new string[splitEntry.Length][];
+
+                    for (int j = 0; j < splitEntry.Length; j++)
+                    {
+                        // split accountname and balance between comma
+                        string[] splitAccounts = splitEntry[j].Split(',');
+                        // store accountname and balance to array
+                        accounts[i][j] = new string[] { splitAccounts[0], splitAccounts[1] };
+                    }
+
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Accounts-filen hittades inte");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Fel i accounts.txt {e.Message}");
+            }
+            //--------!!!! OLD CODE !!!!---------//
             // initialize users
-            users = new long[][]
-            {
-                new long[] { 9101010101 , 1234 },
-                new long[] { 9202020202 , 2345 },
-                new long[] { 9303030303 , 3456 },
-                new long[] { 9404040404 , 4567 },
-                new long[] { 9505050505 , 5678 }
-            };
+            //users = new long[][]
+            //{
+            //    new long[] { 9101010101 , 1234 },
+            //    new long[] { 9202020202 , 2345 },
+            //    new long[] { 9303030303 , 3456 },
+            //    new long[] { 9404040404 , 4567 },
+            //    new long[] { 9505050505 , 5678 }
+            //};
             // initialize accounts
-            accounts = new string[][][]
-            {
-                new string[][] { new string[] { "Kortkonto", "1000.50" }, new string[] { "Sparkonto", "500.66" } },
-                new string[][] { new string[] { "Kortkonto", "2000.34" }, new string[] { "Sparkonto", "1000.56" } },
-                new string[][] { new string[] { "Kortkonto", "3000.23" }, new string[] { "Sparkonto", "1500.56" } },
-                new string[][] { new string[] { "Kortkonto", "4000.77" }, new string[] { "Sparkonto", "2000.32" } },
-                new string[][] { new string[] { "Kortkonto", "5000.53" }, new string[] { "Sparkonto", "2500.12" } }
-            };
+            //accounts = new string[][][]
+            //{
+            //    new string[][] { new string[] { "Kortkonto", "1000.50" }, new string[] { "Sparkonto", "500.66" } },
+            //    new string[][] { new string[] { "Kortkonto", "2000.34" }, new string[] { "Sparkonto", "1000.56" } },
+            //    new string[][] { new string[] { "Kortkonto", "3000.23" }, new string[] { "Sparkonto", "1500.56" } },
+            //    new string[][] { new string[] { "Kortkonto", "4000.77" }, new string[] { "Sparkonto", "2000.32" } },
+            //    new string[][] { new string[] { "Kortkonto", "5000.53" }, new string[] { "Sparkonto", "2500.12" } }
+            //};
         }
 
         public static int UserLoggIn()
