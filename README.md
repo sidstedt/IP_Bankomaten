@@ -6,6 +6,23 @@ Detta program ska hantera inloggning av användare mot en bankomat.
 Användaren får tre försök på sig, misslyckas du stängs programmet av.
 Lyckas du kommer du till menyn där du kan göra enkla kontohanteringar.
 
+# Reflektion
+
+REFLEKTION
+
+Detta är en reflektion på det jag har gjort innan jag tagit mig an extrautmaningarna.
+
+Grundtanken var att bygga en strukturerad simpelt flöde av kod med metoder som hänvisning för att enklare kunna orientera sig med enklare kommentarer till, vilket jag tycker att jag lyckats med.
+Då vi i våran uppgift inte fått använda oss av klasser eller objekt, använde jag mig av jagged arrays för att underlätta indexering av användarens uppgifter samt konton.
+Arrayerna hör samman genom indexering. Så användaren på index 0 i users har samhörighet med index 0 i accounts, samma för index 1 o.s.v.
+Men det hade varit betydligt bättre att få använda List<T>, då den är dynamisk och ett bättre alternativ om man skulle utöka programmet ännu mer.
+Eller OOP med users & accounts där man lägger in dom som sina egna klasser.
+Samtidigt hade databashantering av konton och användare varit mycket lättare att hantera då man kan länka samman användare med konton genom relation. Samt att det hade varit mycket säkrare.
+Felhanteringar har hanterats med hjälp av if-satser ihop med TryParse.
+Förbättringar skulle behövas implementeras där hantering av uttag eller överföringar från konton där saldot är 0.
+
+
+
 # Delmoment i projektet
 
 Denna sektion är till för att hålla koll på vad som ska göras och vad som är gjort.
