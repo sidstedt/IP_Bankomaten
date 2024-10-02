@@ -63,47 +63,9 @@ namespace IP_Bankomaten
                 // else user input wrong personal number
                 if (userIndex != -1)
                 {
-                    // how many tries user have to input correct pin code
-                    int tries = 3;
-                    // the parameter is oboslete as the code block returns
-                    // a value either way
-                    while (tries != 0)
+                    if (CheckPinCode(userIndex))
                     {
-                        Console.Write("pinkod: ");
-                        // if the user does not input correct value i.e. "abc" or "/&¤"
-                        if (!int.TryParse(Console.ReadLine(), out int pinCode))
-                        {
-                            Console.Clear();
-                            Console.WriteLine("ogiltligt värde, försök igen");
-                            Console.WriteLine($"Du har {tries} försök kvar.");
-                            continue;
-                        }
-                        // call method and pass along values and save return bool value
-                        bool checkedPinCode = CheckPinCode(userIndex, pinCode);
-                        // if personal number & pin code match return index value
-                        if (checkedPinCode)
-                        {
-                            Console.WriteLine("lyckad inloggning");
-                            return userIndex;
-                        }
-                        // if user input correct pin code negate tries with 1
-                        // and write out how many attempts left
-                        else
-                        {
-                            Console.Clear();
-                            tries--;
-                            // write out as long as the user have tries left
-                            if (tries > 0)
-                                Console.WriteLine($"Fel pinkod! Du har {tries} försök kvar.");
-                        }
-                        // if no tries are left close down
-                        if (tries == 0)
-                        {
-                            Console.WriteLine("Du har angett fel pinkod för många gånger!" +
-                                "\nTryck på valfri tanget för att stänga av.");
-                            Console.ReadKey();
-                            Environment.Exit(0);
-                        }
+                        return userIndex;
                     }
                 }
                 // if user could not be found
@@ -228,6 +190,14 @@ namespace IP_Bankomaten
                         // if the amount to withdraw is less or equal to balance
                         if (amountToWithdraw <= currentBalance)
                         {
+                            bool checkPin = false;
+                            while (!checkPin)
+                            {
+                                if (CheckPinCode(userIndex))
+                                {
+                                    checkPin = true;
+                                }
+                            }
                             // negate the current balance with the amount to withdraw
                             currentBalance -= amountToWithdraw;
                             // convert to string and save amount left to account
@@ -397,16 +367,59 @@ namespace IP_Bankomaten
             }
             return -1;
         }
-        public static bool CheckPinCode(int userIndex, int pinCode)
+        public static bool CheckPinCode(int userIndex)
         {
-            // iteriate through the amount of total index length
-            for (int i = 0; i < users.Length; i++)
+            // how many tries user have to input correct pin code
+            int tries = 3;
+            bool checkedPinCode = false;
+            // the parameter is oboslete as the code block returns
+            // a value either way
+            while (tries != 0)
             {
-                // if user index with associated pin code is same as input
-                // return bool = true
-                if (users[userIndex][1] == pinCode)
+                Console.Write("pinkod: ");
+                // if the user does not input correct value i.e. "abc" or "/&¤"
+                if (!int.TryParse(Console.ReadLine(), out int pinCode))
                 {
+                    Console.Clear();
+                    Console.WriteLine("ogiltligt värde, försök igen");
+                    Console.WriteLine($"Du har {tries} försök kvar.");
+                    continue;
+                }
+                // iteriate through the amount of total index length
+                for (int i = 0; i < users.Length; i++)
+                {
+                    // if user index with associated pin code is same as input
+                    // return bool = true
+                    if (users[userIndex][1] == pinCode)
+                    {
+                        checkedPinCode = true;
+                    }
+                }
+                // call method and pass along values and save return bool value
+
+                // if personal number & pin code match return index value
+                if (checkedPinCode)
+                {
+                    Console.WriteLine("lyckad inloggning");
                     return true;
+                }
+                // if user input correct pin code negate tries with 1
+                // and write out how many attempts left
+                else
+                {
+                    Console.Clear();
+                    tries--;
+                    // write out as long as the user have tries left
+                    if (tries > 0)
+                        Console.WriteLine($"Fel pinkod! Du har {tries} försök kvar.");
+                }
+                // if no tries are left close down
+                if (tries == 0)
+                {
+                    Console.WriteLine("Du har angett fel pinkod för många gånger!" +
+                        "\nTryck på valfri tanget för att stänga av.");
+                    Console.ReadKey();
+                    Environment.Exit(0);
                 }
             }
             return false;
