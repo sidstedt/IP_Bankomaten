@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Globalization;
 
 namespace IP_Bankomaten
 {
@@ -9,16 +10,24 @@ namespace IP_Bankomaten
         public static string[][][] accounts;
         static void Main(string[] args)
         {
+            bool stayRunning = true;
             // call method to store users and accounts
             InitializeUsersAndAccount();
-            // call method and store return value
-            int userIndex = UserLoggIn();
-            // if return value is not negative
-            if (userIndex != -1)
+            while (stayRunning)
             {
-                Console.Clear();
-                // call method and pass index value
-                UserLoggedIn(userIndex);
+                // call method and store return value
+                int userIndex = UserLoggIn();
+                // if return value is not negative
+                if (userIndex == -1)
+                {
+                    stayRunning = false;
+                }
+                else
+                {
+                    Console.Clear();
+                    // call method and pass index value
+                    UserLoggedIn(userIndex);
+                }
             }
         }
         public static void InitializeUsersAndAccount()
@@ -66,7 +75,7 @@ namespace IP_Bankomaten
                     for (int j = 0; j < splitEntry.Length; j++)
                     {
                         // split accountname and balance between comma
-                        string[] splitAccounts = splitEntry[j].Split(',');
+                        string[] splitAccounts = splitEntry[j].Split(':');
                         // store accountname and balance to array
                         accounts[i][j] = new string[] { splitAccounts[0], splitAccounts[1] };
                     }
@@ -140,7 +149,6 @@ namespace IP_Bankomaten
             }
             return -1;
         }
-
         public static void UserLoggedIn(int userIndex)
         {
             bool run = true;
@@ -182,7 +190,8 @@ namespace IP_Bankomaten
             // Loop through and write out all associated accounts from user
             for (int i = 0; i < accounts[userIndex].Length; i++)
             {
-                Console.WriteLine($"Konto: {accounts[userIndex][i][0]}, Saldo: {double.Parse(accounts[userIndex][i][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}");
+                double balance = double.Parse(accounts[userIndex][i][1], CultureInfo.InvariantCulture);
+                Console.WriteLine($"Konto: {accounts[userIndex][i][0]}, Saldo: {balance.ToString("C", new CultureInfo("sv-SE"))}");
             }
             Console.WriteLine("\nTryck på enter för att återgå till menyn!");
             while (Console.ReadKey(true).Key != ConsoleKey.Enter) { }
@@ -192,6 +201,7 @@ namespace IP_Bankomaten
             bool select = true;
             // give first "index value" to selectedAccount
             int selectedAccount = 0;
+            double balance = 0;
             while (select)
             {
                 Console.Clear();
@@ -210,7 +220,8 @@ namespace IP_Bankomaten
                     {
                         Console.ResetColor();
                     }
-                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {double.Parse(accounts[userIndex][i][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}");
+                    balance = double.Parse(accounts[userIndex][i][1], CultureInfo.InvariantCulture);
+                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {balance.ToString("C2", new CultureInfo("sv-SE"))}");
                 }
                 Console.ResetColor();
                 // store inputkey from user
@@ -229,50 +240,59 @@ namespace IP_Bankomaten
                         break;
                     // if user press enter exit loop
                     case ConsoleKey.Enter:
+                        balance = double.Parse(accounts[userIndex][selectedAccount][1], CultureInfo.InvariantCulture);
                         select = false;
                         break;
                 }
             }
-            if (selectedAccount != -1)
+            if (balance != 0 && selectedAccount != -1)
             {
                 bool run = true;
                 while (run)
                 {
                     Console.Clear();
                     Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} " +
-                        $"med saldot: {double.Parse(accounts[userIndex][selectedAccount][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}");
+                        $"med saldot: {balance.ToString("C2", new CultureInfo("sv-SE"))}");
                     Console.Write("Ange belopp att ta ut: ");
                     // if user input is correct
                     if (double.TryParse(Console.ReadLine(), out double amountToWithdraw))
                     {
                         // parse the value from account to int and store to variable
-                        double currentBalance = double.Parse(accounts[userIndex][selectedAccount][1]);
                         // if the amount to withdraw is less or equal to balance
-                        if (amountToWithdraw <= currentBalance)
+                        if (amountToWithdraw > 0)
                         {
-                            bool checkPin = false;
-                            while (!checkPin)
+                            if (amountToWithdraw <= balance)
                             {
-                                if (CheckPinCode(userIndex))
+                                bool checkPin = false;
+                                while (!checkPin)
                                 {
-                                    checkPin = true;
+                                    if (CheckPinCode(userIndex))
+                                    {
+                                        checkPin = true;
+                                    }
                                 }
+                                // negate the current balance with the amount to withdraw
+                                balance -= amountToWithdraw;
+                                // convert to string and save amount left to account
+                                accounts[userIndex][selectedAccount][1] = balance.ToString("F2", CultureInfo.InvariantCulture);
+                                Console.WriteLine($"Uttaget belopp: {amountToWithdraw}." +
+                                    $"\nNuvarande saldo: {balance.ToString("C2", new CultureInfo("sv-SE"))}.");
+                                Console.WriteLine("\nTryck på enter för att återgå till menyn.");
+                                while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                                { }
+                                run = false;
                             }
-                            // negate the current balance with the amount to withdraw
-                            currentBalance -= amountToWithdraw;
-                            // convert to string and save amount left to account
-                            accounts[userIndex][selectedAccount][1] = currentBalance.ToString();
-                            Console.WriteLine($"Uttaget belopp: {amountToWithdraw}." +
-                                $"\nNuvarande saldo: {double.Parse(accounts[userIndex][selectedAccount][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}.");
-                            Console.WriteLine("\nTryck på enter för att återgå till menyn.");
-                            while (Console.ReadKey(true).Key != ConsoleKey.Enter)
-                            { }
-                            run = false;
+                            // if the amount is bigger than the balance shut down
+                            else
+                            {
+                                Console.WriteLine("\nOtillräckligt saldo! Tryck på enter för att försöka igen.");
+                                while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                                { }
+                            }
                         }
-                        // if the amount is bigger than the balance shut down
                         else
                         {
-                            Console.WriteLine("\nOtillräckligt saldo! Tryck på enter för att försöka igen.");
+                            Console.WriteLine("Du kan inte ta ut mindre än 0! Tryck på enter för att försöak igen.");
                             while (Console.ReadKey(true).Key != ConsoleKey.Enter)
                             { }
                         }
@@ -290,7 +310,8 @@ namespace IP_Bankomaten
             // if no account was selected
             else
             {
-                Console.WriteLine("inget konto valt. Tryck på enter för att återgå till menyn");
+                Console.WriteLine("inget konto valt. Eller otillräckligt saldo." +
+                    "\nTryck på enter för att återgå till menyn");
                 while (Console.ReadKey(true).Key != ConsoleKey.Enter)
                 {
                 }
@@ -322,7 +343,8 @@ namespace IP_Bankomaten
                     {
                         Console.ResetColor();
                     }
-                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {double.Parse(accounts[userIndex][i][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}");
+                    double balance = double.Parse(accounts[userIndex][i][1], CultureInfo.InvariantCulture);
+                    Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {balance.ToString("C2", new CultureInfo("sv-SE"))}");
                 }
                 Console.ResetColor();
                 // store inputkey from user
@@ -346,17 +368,33 @@ namespace IP_Bankomaten
                         {
                             // set choice1 to selected account index value
                             choice1 = selectedAccount;
+                            double balance = double.Parse(accounts[userIndex][selectedAccount][1], CultureInfo.InvariantCulture);
+                            Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} med saldot: {balance.ToString("C2", new CultureInfo("sv-SE"))}");
+                            Console.WriteLine("Tryck på Enter för att fortsätta.");
+                            while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                            {
+                            }
                         }
                         // if the second has no index value
-                        else if (choice2 == -1)
+                        else if (choice2 == -1 && choice1 != selectedAccount)
                         {
                             // set choice2 to selected account index value
                             choice2 = selectedAccount;
+                            double balance = double.Parse(accounts[userIndex][selectedAccount][1], CultureInfo.InvariantCulture);
+                            Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} med saldot: {balance.ToString("C2", new CultureInfo("sv-SE"))}");
+                            Console.WriteLine("Tryck på Enter för att fortsätta.");
+                            while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                            {
+                            }
                         }
-                        Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} med saldot: {double.Parse(accounts[userIndex][selectedAccount][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}");
-                        Console.WriteLine("Tryck på Enter för att fortsätta.");
-                        while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                        else
                         {
+                            Console.WriteLine("Du kan inte välja samma konto!");
+                            Console.WriteLine("Tryck på enter för att fortsätta.");
+                            while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                            {
+                            }
+                            Console.Clear();
                         }
                         // if both have given a value
                         if (choice1 != -1 && choice2 != -1)
@@ -375,37 +413,52 @@ namespace IP_Bankomaten
             while (run)
             {
                 // Save current balance to int variable
-                double BalanceOne = double.Parse(accounts[index][one][1]);
-                double BalanceTwo = double.Parse(accounts[index][two][1]);
-                Console.Write($"Hur mycket vill du föra över från {accounts[index][one][0]} med saldot: {double.Parse(accounts[index][one][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))} till " +
-                    $"{accounts[index][two][0]} med saldot: {double.Parse(accounts[index][two][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}?" +
+                double balanceOne = double.Parse(accounts[index][one][1], CultureInfo.InvariantCulture);
+                double balanceTwo = double.Parse(accounts[index][two][1], CultureInfo.InvariantCulture);
+                Console.Write($"Hur mycket vill du föra över från {accounts[index][one][0]} med saldot: {balanceOne.ToString("C2", new CultureInfo("sv-SE"))} till " +
+                    $"{accounts[index][two][0]} med saldot: {balanceTwo.ToString("C2", new CultureInfo("sv-SE"))}?" +
                     $"\nAnge belopp: ");
                 // check user input
-                if (double.TryParse(Console.ReadLine(), out double amount))
+                if (double.TryParse(Console.ReadLine(), NumberStyles.Float, new CultureInfo("sv-SE"), out double amount))
                 {
-                    // If amount is no more than current value
-                    if (amount <= double.Parse(accounts[index][one][1]))
+                    if (amount > 0)
                     {
-                        Console.Clear();
-                        // subtract and add new value
-                        BalanceOne -= amount;
-                        BalanceTwo += amount;
-                        // overwrite to new value
-                        accounts[index][one][1] = BalanceOne.ToString();
-                        accounts[index][two][1] = BalanceTwo.ToString();
-                        Console.WriteLine($"Överföring gjord. Nuvarande saldo" +
-                            $"\n{accounts[index][one][0]} med saldot: {double.Parse(accounts[index][one][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}" +
-                            $"\n{accounts[index][two][0]} med saldot: {double.Parse(accounts[index][two][1]).ToString("C2", new System.Globalization.CultureInfo("sv-SE"))}");
-                        Console.WriteLine("\nTryck på enter för att återgå till menyn");
-                        while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                        // If amount is no more than current value
+                        if (amount <= balanceOne)
                         {
+                            Console.Clear();
+                            // subtract and add new value
+                            balanceOne -= amount;
+                            balanceTwo += amount;
+                            // overwrite to new value
+                            accounts[index][one][1] = balanceOne.ToString("F2", CultureInfo.InvariantCulture);
+                            accounts[index][two][1] = balanceTwo.ToString("F2", CultureInfo.InvariantCulture);
+                            Console.WriteLine($"Överföring gjord. Nuvarande saldo" +
+                                $"\n{accounts[index][one][0]} med saldot: {balanceOne.ToString("C2", new CultureInfo("sv-SE"))}" +
+                                $"\n{accounts[index][two][0]} med saldot: {balanceTwo.ToString("C2", new CultureInfo("sv-SE"))}");
+                            Console.WriteLine("\nTryck på enter för att återgå till menyn");
+                            while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                            {
+                            }
+                            run = false;
                         }
-                        run = false;
+                        else
+                        {
+                            Console.WriteLine("Angivet belopp är mer än vad som är tillgängligt. Försök igen!");
+                            while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                            {
+                            }
+                            Console.Clear();
+                        }
                     }
                     else
                     {
+                        Console.WriteLine("Du kan inte ange ett tal minde än 0!");
+                        Console.WriteLine("Tryck på enter för att försöka igen.");
+                        while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                        {
+                        }
                         Console.Clear();
-                        Console.WriteLine("Angivet belopp är mer än vad som är tillgängligt. Försök igen!");
                     }
                 }
                 else
