@@ -1,14 +1,48 @@
 # IP_Bankomaten
 
-INLEDNING
+### INLEDNING
 
 Detta program ska hantera inloggning av användare mot en bankomat.
 Användaren får tre försök på sig, misslyckas du stängs programmet av.
 Lyckas du kommer du till menyn där du kan göra enkla kontohanteringar.
 
-# Reflektion
+### KODSTRUKTUR
 
-REFLEKTION
+Programet laddar in förbestämda väreden till jagged arrays genom textfiler.
+
+```c#
+public static long[][] users;
+public static string[][] accountName;
+public static decimal[][] accountBalance;
+```
+Därefter  
+Och dessa läses in genom metodanrop från
+```C#
+public static void InitializeUsersAndAccount()
+```
+
+Sedan fortsätter koden med metodanrop UserLoggIn(), samt kallar på SearchUser() som jämför användarens input.  
+Om användaren finns så kallar den på metoden CheckPinCode(userIndex) i en if sats som sedan returnerar indexvärdet.
+```C#
+int userIndex = UserLoggIn();
+```
+```C#
+SearchUser(long userName)
+
+if (users[i][0] == userName)
+    {
+        return i;
+    }
+```
+```C#
+if (CheckPinCode(userIndex))
+    {
+        return userIndex;
+    }
+```
+Därefter tas användaren vi lyckad inloggning till menyn genom metod UserLoggedIn(userIndex). Annars 
+
+### REFLEKTION
 
 Detta är en reflektion på det jag har gjort innan jag tagit mig an extrautmaningarna.
 
