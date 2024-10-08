@@ -1,12 +1,12 @@
 # IP_Bankomaten
 
-### INLEDNING
+## INLEDNING
 
 Detta program ska hantera inloggning av användare mot en bankomat.
 Användaren får tre försök på sig, misslyckas du stängs programmet av.
 Lyckas du kommer du till menyn där du kan göra enkla kontohanteringar.
 
-### KODSTRUKTUR
+## KODSTRUKTUR
 
 Programet laddar in förbestämda väreden till jagged arrays genom textfiler.
 
@@ -40,26 +40,80 @@ if (CheckPinCode(userIndex))
         return userIndex;
     }
 ```
-Därefter tas användaren vi lyckad inloggning till menyn genom metod UserLoggedIn(userIndex). Annars 
+Därefter tas användaren vi lyckad inloggning till menyn genom metod UserLoggedIn(userIndex), eller så sätts bool till false och programmet stängs ner.
+```C#
+if (userIndex == -1)
+    {
+        stayRunning = false;
+    }
+else
+    {
+        Console.Clear();
+        UserLoggedIn(userIndex);
+    }
+```
+Menyn körs med en switch som ropar på den metod användaren vill nå
+```C#
+switch (menuChoice)
+    {
+        case 1:
+            Accounts(userIndex);
+            break;
+        case 2:
+            Transfer(userIndex);
+            break;
+        case 3:
+            Withdrawal(userIndex);
+            break;
+        case 4:
+            run = false;
+            break;
+    }
+```
+Accounts(int userIndex) hanterar att lista konton med en for-loop.
+```C#
+for (int i = 0; i < accountName[userIndex].Length; i++)
+{
+    Console.WriteLine($"Konto: {accountName[userIndex][i]}, Saldo: {accountBalance[userIndex][i]:C}");
+}
+```
+Transfer(int userIndex) körs med ConsoleKey.Down/Up-arrow och enter som val.  
+När använaren har valt så får han välja nästa konto som ska överföras till och man kan inte välja samma konto.  
+När man valt konto ropas metoden TransferMoney(int userIndex, int one, int two).  
+Där får användaren skriva in ett positivt belopp som inte får överskrida befintligt saldo.  
+Sedan skrivs dom nya saldona över i arrayen och presenteras för användaren.  
 
-### REFLEKTION
+Withdrawal(int userIndex) tar hand om uttaget användaren vill göra.  
+Fungerar på samma sätt som Transfer(int userIndex) när man väljer konto och hur mycket pengar som ska hanteras.  
+När användaren angivit ett giltligt belopp påkallas metoden CheckPinCode(int userIndex).  
+Misslyckas stängs programmet ner annars får användaren ut sina pengar och återgår till menyn.
+
+Sista alternativ returnerar false när användaren vill logga ut.  
+Vilket stänger while-loopen för menyn och tar användaren till inloggningssidan.
+
+## REFLEKTION
 
 Detta är en reflektion på det jag har gjort innan jag tagit mig an extrautmaningarna.
 
-Grundtanken var att bygga en strukturerad simpelt flöde av kod med metoder som hänvisning för att enklare kunna orientera sig med enklare kommentarer till, vilket jag tycker att jag lyckats med.
-Då vi i våran uppgift inte fått använda oss av klasser eller objekt, använde jag mig av jagged arrays för att underlätta indexering av användarens uppgifter samt konton.
-Arrayerna hör samman genom indexering. Så användaren på index 0 i users har samhörighet med index 0 i accounts, samma för index 1 o.s.v.
-Men det hade varit betydligt bättre att få använda List<T>, då den är dynamisk och ett bättre alternativ om man skulle utöka programmet ännu mer.
-Eller OOP med users & accounts där man lägger in dom som sina egna klasser.
-Samtidigt hade databashantering av konton och användare varit mycket lättare att hantera då man kan länka samman användare med konton genom relation. Samt att det hade varit mycket säkrare.
-Felhanteringar har hanterats med hjälp av if-satser ihop med TryParse.
-Förbättringar skulle behövas implementeras där hantering av uttag eller överföringar från konton där saldot är 0.
+Grundtanken var att bygga en strukturerad kod med simpelt flöde där fokus ligger på att kalla på metoder som hänvisning för att enklare kunna orientera sig.  
+I koden har jag lagt simplare förklaringar, vilket jag tycker att jag har lyckats med.  
+Då vi i våran uppgift inte fått använda oss av klasser eller objekt, använde jag mig av jagged arrays för att underlätta indexering av användarens uppgifter samt konton.  
+Arrayerna hör samman genom indexering. Så användaren på index 0 i users har samhörighet med index 0 i accounts, samma för index 1 o.s.v. Men det har fungerat bra i detta syfte.  
+Och att jag gick över från att läsa in users, konton och saldon från filer istället för att hårdkoda det i programmet.  
+Vilket underlättar för framtida metoder som kan hantera funktioner som att spara varje session till fil, så kontons saldon som har förändrats sparas.  
+Eller om använaren skapar nya konton och instättningar.
+Felhanteringar har hanterats med hjälp av if-satser ihop med TryParse, även try catch vid inläsning av txt-filerna.
 
-
+Men det hade varit betydligt bättre att få använda List<T>, då den är dynamisk och ett bättre alternativ om man skulle utöka programmet ännu mer.  
+Eller koda objektorienterat med users & accounts som sina egna klasser.  
+Samtidigt hade databashantering av konton och användare varit mycket lättare att hantera då man kan länka samman användare med konton genom relation. Samt att det hade varit mycket säkrare.  
+Jag kunde ha lagt till bättre felhantering, speciellt där användarens saldo når 0. Vilket skapar en ändlös loop vid uttag eller överföringar.  
+För övrigt kunde jag lagt till så användaren kan få möjligheten att stänga ner programmet och inte bara logga ut.
+Eller att användaren kunde ha gjort instättningar. För det är samma princip som transfer- eller withdrawalmetoderna.
 
 # Delmoment i projektet
 
-Denna sektion är till för att hålla koll på vad som ska göras och vad som är gjort.
+Denna sektion håller koll på vad som ska göras och vad som är gjort
 
 🔒 **Start av programmet och inloggning**
 
