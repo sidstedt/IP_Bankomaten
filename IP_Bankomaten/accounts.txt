@@ -1,5 +1,5 @@
-Kortkonto:1000.50 Sparkonto:500.66
-Kortkonto:2000.34 Sparkonto:1000.56
-Kortkonto:3000.23 Sparkonto:1500.56
-Kortkonto:4000.77 Sparkonto:2000.32
-Kortkonto:5000.53 Sparkonto:2500.12
+Kortkonto:Sparkonto
+Kortkonto:Sparkonto
+Kortkonto:Sparkonto
+Kortkonto:Sparkonto
+Kortkonto:Sparkonto
