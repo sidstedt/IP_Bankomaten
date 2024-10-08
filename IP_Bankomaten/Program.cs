@@ -190,7 +190,7 @@ namespace IP_Bankomaten
             // Loop through and write out all associated accounts from user
             for (int i = 0; i < accounts[userIndex].Length; i++)
             {
-                double balance = double.Parse(accounts[userIndex][i][1], CultureInfo.InvariantCulture);
+                decimal balance = decimal.Parse(accounts[userIndex][i][1], CultureInfo.InvariantCulture);
                 Console.WriteLine($"Konto: {accounts[userIndex][i][0]}, Saldo: {balance.ToString("C", new CultureInfo("sv-SE"))}");
             }
             Console.WriteLine("\nTryck på enter för att återgå till menyn!");
@@ -201,7 +201,7 @@ namespace IP_Bankomaten
             bool select = true;
             // give first "index value" to selectedAccount
             int selectedAccount = 0;
-            double balance = 0;
+            decimal balance = 0;
             while (select)
             {
                 Console.Clear();
@@ -220,7 +220,7 @@ namespace IP_Bankomaten
                     {
                         Console.ResetColor();
                     }
-                    balance = double.Parse(accounts[userIndex][i][1], CultureInfo.InvariantCulture);
+                    balance = decimal.Parse(accounts[userIndex][i][1], CultureInfo.InvariantCulture);
                     Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {balance.ToString("C2", new CultureInfo("sv-SE"))}");
                 }
                 Console.ResetColor();
@@ -240,7 +240,7 @@ namespace IP_Bankomaten
                         break;
                     // if user press enter exit loop
                     case ConsoleKey.Enter:
-                        balance = double.Parse(accounts[userIndex][selectedAccount][1], CultureInfo.InvariantCulture);
+                        balance = decimal.Parse(accounts[userIndex][selectedAccount][1], CultureInfo.InvariantCulture);
                         select = false;
                         break;
                 }
@@ -255,7 +255,7 @@ namespace IP_Bankomaten
                         $"med saldot: {balance.ToString("C2", new CultureInfo("sv-SE"))}");
                     Console.Write("Ange belopp att ta ut: ");
                     // if user input is correct
-                    if (double.TryParse(Console.ReadLine(), out double amountToWithdraw))
+                    if (decimal.TryParse(Console.ReadLine(), out decimal amountToWithdraw))
                     {
                         // parse the value from account to int and store to variable
                         // if the amount to withdraw is less or equal to balance
@@ -343,7 +343,7 @@ namespace IP_Bankomaten
                     {
                         Console.ResetColor();
                     }
-                    double balance = double.Parse(accounts[userIndex][i][1], CultureInfo.InvariantCulture);
+                    decimal balance = decimal.Parse(accounts[userIndex][i][1], CultureInfo.InvariantCulture);
                     Console.WriteLine($"Konto {i + 1}: {accounts[userIndex][i][0]}, Saldo: {balance.ToString("C2", new CultureInfo("sv-SE"))}");
                 }
                 Console.ResetColor();
@@ -368,7 +368,7 @@ namespace IP_Bankomaten
                         {
                             // set choice1 to selected account index value
                             choice1 = selectedAccount;
-                            double balance = double.Parse(accounts[userIndex][selectedAccount][1], CultureInfo.InvariantCulture);
+                            decimal balance = decimal.Parse(accounts[userIndex][selectedAccount][1], CultureInfo.InvariantCulture);
                             Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} med saldot: {balance.ToString("C2", new CultureInfo("sv-SE"))}");
                             Console.WriteLine("Tryck på Enter för att fortsätta.");
                             while (Console.ReadKey(true).Key != ConsoleKey.Enter)
@@ -380,7 +380,7 @@ namespace IP_Bankomaten
                         {
                             // set choice2 to selected account index value
                             choice2 = selectedAccount;
-                            double balance = double.Parse(accounts[userIndex][selectedAccount][1], CultureInfo.InvariantCulture);
+                            decimal balance = decimal.Parse(accounts[userIndex][selectedAccount][1], CultureInfo.InvariantCulture);
                             Console.WriteLine($"Du har valt {accounts[userIndex][selectedAccount][0]} med saldot: {balance.ToString("C2", new CultureInfo("sv-SE"))}");
                             Console.WriteLine("Tryck på Enter för att fortsätta.");
                             while (Console.ReadKey(true).Key != ConsoleKey.Enter)
@@ -413,13 +413,13 @@ namespace IP_Bankomaten
             while (run)
             {
                 // Save current balance to int variable
-                double balanceOne = double.Parse(accounts[index][one][1], CultureInfo.InvariantCulture);
-                double balanceTwo = double.Parse(accounts[index][two][1], CultureInfo.InvariantCulture);
+                decimal balanceOne = decimal.Parse(accounts[index][one][1], CultureInfo.InvariantCulture);
+                decimal balanceTwo = decimal.Parse(accounts[index][two][1], CultureInfo.InvariantCulture);
                 Console.Write($"Hur mycket vill du föra över från {accounts[index][one][0]} med saldot: {balanceOne.ToString("C2", new CultureInfo("sv-SE"))} till " +
                     $"{accounts[index][two][0]} med saldot: {balanceTwo.ToString("C2", new CultureInfo("sv-SE"))}?" +
                     $"\nAnge belopp: ");
                 // check user input
-                if (double.TryParse(Console.ReadLine(), NumberStyles.Float, new CultureInfo("sv-SE"), out double amount))
+                if (decimal.TryParse(Console.ReadLine(), NumberStyles.Float, new CultureInfo("sv-SE"), out decimal amount))
                 {
                     if (amount > 0)
                     {
