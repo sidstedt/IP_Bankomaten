@@ -1,5 +1,5 @@
-Kortkonto:Sparkonto
-Kortkonto:Sparkonto
-Kortkonto:Sparkonto
-Kortkonto:Sparkonto
-Kortkonto:Sparkonto
+Kortkonto
+Kortkonto:Barnkonto
+Kortkonto:Sparkonto:Barnkonto:Vuxenkonto
+Kortkonto:Sparkonto:Barnkonto:Vuxenkonto:Pensionskonto
+Kortkonto:Sparkonto:Barnkonto:Vuxenkonto:PensionsKonto:Begravningskonto

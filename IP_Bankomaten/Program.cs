@@ -143,7 +143,7 @@ namespace IP_Bankomaten
             while (run)
             {
                 Console.WriteLine("Välkommen till Daniels Bank AB");
-                Console.WriteLine("Ange personnr och din 5-siffriga pinkod!");
+                Console.WriteLine("Ange personnr och din 4-siffriga pinkod!");
                 Console.Write("Personnr: ");
                 // declare and try the user input else write out to try again
                 if (!long.TryParse(Console.ReadLine(), out long userName))
@@ -196,7 +196,19 @@ namespace IP_Bankomaten
                         Accounts(userIndex);
                         break;
                     case 2:
-                        Transfer(userIndex);
+                        if (accountName[userIndex].Length > 1)
+                        {
+                            Transfer(userIndex);
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Överföring kan inte göras. Du har bara ett konto.\n" +
+                                "Ny \"Öppna konto\"-funktion kommer inom kort");
+                            Console.WriteLine("Tryck på enter för att återgå till menyn");
+                            while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                            { }
+                        }
                         break;
                     case 3:
                         Withdrawal(userIndex);
@@ -244,7 +256,7 @@ namespace IP_Bankomaten
                     {
                         Console.ResetColor();
                     }
-                    Console.WriteLine($"Konto {i + 1}: {accountName[userIndex][i][0]}, Saldo: {accountBalance[userIndex][i]:C}");
+                    Console.WriteLine($"Konto {i + 1}: {accountName[userIndex][i]}, Saldo: {accountBalance[userIndex][i]:C}");
                 }
                 Console.ResetColor();
                 // store inputkey from user
@@ -268,13 +280,13 @@ namespace IP_Bankomaten
                         break;
                 }
             }
-            if (balance != 0 && selectedAccount != -1)
+            if (balance > 0 && selectedAccount != -1)
             {
                 bool run = true;
                 while (run)
                 {
                     Console.Clear();
-                    Console.WriteLine($"Du har valt {accountName[userIndex][selectedAccount][0]} " +
+                    Console.WriteLine($"Du har valt {accountName[userIndex][selectedAccount]} " +
                         $"med saldot: {balance:C}");
                     Console.Write("Ange belopp att ta ut: ");
                     // if user input is correct
@@ -297,7 +309,7 @@ namespace IP_Bankomaten
                                 // negate the current balance with the amount to withdraw
                                 balance -= amountToWithdraw;
                                 // convert to string and save amount left to account
-                                accountBalance[userIndex][1] = balance;
+                                accountBalance[userIndex][selectedAccount] = balance;
                                 Console.WriteLine($"Uttaget belopp: {amountToWithdraw:C}." +
                                     $"\nNuvarande saldo: {balance:C}.");
                                 Console.WriteLine("\nTryck på enter för att återgå till menyn.");
@@ -366,7 +378,7 @@ namespace IP_Bankomaten
                     {
                         Console.ResetColor();
                     }
-                    Console.WriteLine($"Konto {i + 1}: {accountName[userIndex][i][0]}, Saldo: {accountBalance[userIndex][i]:C}");
+                    Console.WriteLine($"Konto {i + 1}: {accountName[userIndex][i]}, Saldo: {accountBalance[userIndex][i]:C}");
                 }
                 Console.ResetColor();
                 // store inputkey from user
@@ -390,7 +402,7 @@ namespace IP_Bankomaten
                         {
                             // set choice1 to selected account index value
                             choice1 = selectedAccount;
-                            Console.WriteLine($"Du har valt {accountName[userIndex][selectedAccount][0]} med saldot: {accountBalance[userIndex][selectedAccount]:C}");
+                            Console.WriteLine($"Du har valt {accountName[userIndex][selectedAccount]}: {accountBalance[userIndex][selectedAccount]:C}");
                             Console.WriteLine("Tryck på Enter för att fortsätta.");
                             while (Console.ReadKey(true).Key != ConsoleKey.Enter)
                             {
@@ -401,7 +413,7 @@ namespace IP_Bankomaten
                         {
                             // set choice2 to selected account index value
                             choice2 = selectedAccount;
-                            Console.WriteLine($"Du har valt {accountName[userIndex][selectedAccount][0]} med saldot: {accountBalance[userIndex][selectedAccount]:C}");
+                            Console.WriteLine($"Du har valt {accountName[userIndex][selectedAccount]}: {accountBalance[userIndex][selectedAccount]:C}");
                             Console.WriteLine("Tryck på Enter för att fortsätta.");
                             while (Console.ReadKey(true).Key != ConsoleKey.Enter)
                             {
@@ -432,39 +444,53 @@ namespace IP_Bankomaten
             bool run = true;
             while (run)
             {
-                // Save current balance to int variable
-                decimal balanceOne = accountBalance[userIndex][one];
-                decimal balanceTwo = accountBalance[userIndex][two];
-                Console.Write($"Hur mycket vill du föra över från {accountName[userIndex][one][0]} med saldot: {balanceOne:C} till " +
-                    $"{accountName[userIndex][two][0]} med saldot: {balanceTwo:C}?" +
-                    $"\nAnge belopp: ");
-                // check user input
-                if (decimal.TryParse(Console.ReadLine(), NumberStyles.Float, new CultureInfo("sv-SE"), out decimal amount))
+                if (accountBalance[userIndex][one] > 0)
                 {
-                    if (amount > 0)
+                    // Save current balance to int variable
+                    decimal balanceOne = accountBalance[userIndex][one];
+                    decimal balanceTwo = accountBalance[userIndex][two];
+                    Console.Write($"Hur mycket vill du föra över från:\n" +
+                        $"{accountName[userIndex][one]}: {balanceOne:C}\n" +
+                        $"till\n" +
+                        $"{accountName[userIndex][two]}: {balanceTwo:C}?" +
+                        $"\nAnge belopp: ");
+                    // check user input
+                    if (decimal.TryParse(Console.ReadLine(), NumberStyles.Float, new CultureInfo("sv-SE"), out decimal amount))
                     {
-                        // If amount is no more than current value
-                        if (amount <= balanceOne)
+                        if (amount > 0)
                         {
-                            Console.Clear();
-                            // subtract and add new value
-                            balanceOne -= amount;
-                            balanceTwo += amount;
-                            // overwrite to new value
-                            accountBalance[userIndex][one] = balanceOne;
-                            accountBalance[userIndex][two] = balanceTwo;
-                            Console.WriteLine($"Överföring gjord. Nuvarande saldo" +
-                                $"\n{accountName[userIndex][one][0]} med saldot: {balanceOne:C}" +
-                                $"\n{accountName[userIndex][two][0]} med saldot: {balanceTwo:C}");
-                            Console.WriteLine("\nTryck på enter för att återgå till menyn");
-                            while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                            // If amount is no more than current value
+                            if (amount <= balanceOne)
                             {
+                                Console.Clear();
+                                // subtract and add new value
+                                balanceOne -= amount;
+                                balanceTwo += amount;
+                                // overwrite to new value
+                                accountBalance[userIndex][one] = balanceOne;
+                                accountBalance[userIndex][two] = balanceTwo;
+                                Console.WriteLine($"Överföring gjord. Nuvarande saldo" +
+                                    $"\n{accountName[userIndex][one]}: {balanceOne:C}" +
+                                    $"\n{accountName[userIndex][two]}: {balanceTwo:C}");
+                                Console.WriteLine("\nTryck på enter för att återgå till menyn");
+                                while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                                {
+                                }
+                                run = false;
                             }
-                            run = false;
+                            else
+                            {
+                                Console.WriteLine("Angivet belopp är mer än vad som är tillgängligt. Försök igen!");
+                                while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                                {
+                                }
+                                Console.Clear();
+                            }
                         }
                         else
                         {
-                            Console.WriteLine("Angivet belopp är mer än vad som är tillgängligt. Försök igen!");
+                            Console.WriteLine("Du kan inte ange ett tal minde än 0!");
+                            Console.WriteLine("Tryck på enter för att försöka igen.");
                             while (Console.ReadKey(true).Key != ConsoleKey.Enter)
                             {
                             }
@@ -473,17 +499,17 @@ namespace IP_Bankomaten
                     }
                     else
                     {
-                        Console.WriteLine("Du kan inte ange ett tal minde än 0!");
-                        Console.WriteLine("Tryck på enter för att försöka igen.");
-                        while (Console.ReadKey(true).Key != ConsoleKey.Enter)
-                        {
-                        }
-                        Console.Clear();
+                        Console.WriteLine("Ogiltligt val! Försök igen");
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Ogiltligt val! Försök igen");
+                    Console.WriteLine("Otillräckligt med saldo för överföring!");
+                    Console.WriteLine("Tryck på enter för att återgå till menyn");
+                    while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                    {
+                    }
+                    break;
                 }
             }
         }
